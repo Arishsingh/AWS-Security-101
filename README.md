@@ -55,15 +55,6 @@ It stands as proof that with focus and the right mindset, anything is possible �
 
 ---
 
-## 👥 Shoutout to My Amazing Team
-
-This wouldn’t have been the same without the amazing people I met at the event:  
-**Honey Sharma**, **Aanchal Bhatt**, and **Aditipriya Dubey** – I’m truly looking forward to building something impactful with you all. 🚀
-
-Stay tuned – something exciting is on the way! 💡
-
----
-
 ## 🙏 Special Thanks
 
 Massive gratitude to the event speakers:  
