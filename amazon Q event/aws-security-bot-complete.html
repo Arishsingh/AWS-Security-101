@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS Security 101 Bot</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Amazon Ember', 'Helvetica Neue', Roboto, Arial, sans-serif;
+            background: #232f3e;
+            min-height: 100vh;
+            color: #232f3e;
+        }
+        .aws-nav {
+            background: #232f3e;
+            padding: 12px 0;
+            border-bottom: 1px solid #3c4043;
+        }
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+        }
+        .aws-logo {
+            color: #ff9900;
+            font-size: 24px;
+            font-weight: bold;
+            margin-right: 30px;
+        }
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+        .nav-link {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 400;
+            transition: color 0.2s;
+        }
+        .nav-link:hover {
+            color: #ff9900;
+        }
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            padding: 40px 20px;
+            background: #ffffff;
+            min-height: calc(100vh - 60px);
+        }
+        .header { 
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 60px 20px;
+            background: linear-gradient(135deg, #232f3e 0%, #3c4043 100%);
+            color: white;
+            border-radius: 8px;
+        }
+        .header h1 { 
+            font-size: 48px;
+            font-weight: 300;
+            margin-bottom: 16px;
+            color: #ffffff;
+        }
+        .header .aws-orange {
+            color: #ff9900;
+        }
+        .header p {
+            font-size: 20px;
+            color: #aab7b8;
+            font-weight: 300;
+        }
+        .aws-badge {
+            display: inline-block;
+            background: #ff9900;
+            color: #232f3e;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-top: 20px;
+        }
+        .topics { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+            gap: 24px; 
+            margin-bottom: 40px; 
+        }
+        .topic-btn { 
+            background: #ffffff;
+            color: #232f3e;
+            border: 2px solid #d5dbdb;
+            padding: 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 400;
+            font-size: 16px;
+            text-align: left;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .topic-btn:hover { 
+            border-color: #ff9900;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+        }
+        .topic-icon {
+            font-size: 24px;
+            margin-bottom: 12px;
+            display: block;
+        }
+        .topic-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #232f3e;
+        }
+        .topic-desc {
+            font-size: 14px;
+            color: #5a6c7d;
+            line-height: 1.4;
+        }
+        .content-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        .chat-section {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+        }
+        .chat-box { 
+            background: #ffffff;
+            border: 2px solid #d5dbdb;
+            border-radius: 8px;
+            height: 400px;
+            overflow-y: auto;
+            padding: 24px;
+        }
+        .content-display {
+            background: #ffffff;
+            border: 2px solid #d5dbdb;
+            border-radius: 8px;
+            padding: 24px;
+            height: 400px;
+            overflow-y: auto;
+        }
+        .content-display h3 {
+            color: #ff9900;
+            margin-bottom: 16px;
+            font-size: 20px;
+        }
+        .content-display .content-text {
+            line-height: 1.6;
+            font-size: 14px;
+            color: #232f3e;
+        }
+        .message { 
+            margin-bottom: 24px;
+            padding: 16px 20px;
+            border-radius: 8px;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+        .bot { 
+            background: #f2f3f3;
+            border-left: 4px solid #ff9900;
+        }
+        .user { 
+            background: #eaf7ff;
+            border-left: 4px solid #0073bb;
+            margin-left: 40px;
+        }
+        .message strong {
+            color: #232f3e;
+            font-weight: 600;
+        }
+        .input-area { 
+            display: flex;
+            gap: 12px;
+            padding: 24px;
+            background: #f2f3f3;
+            border-radius: 8px;
+            border: 2px solid #d5dbdb;
+        }
+        input { 
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #d5dbdb;
+            border-radius: 4px;
+            background: #ffffff;
+            font-size: 14px;
+            font-family: inherit;
+        }
+        input:focus { 
+            outline: none;
+            border-color: #ff9900;
+        }
+        .send-btn { 
+            background: #ff9900;
+            color: #232f3e;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+        .send-btn:hover { 
+            background: #e88b00;
+        }
+        .chat-box::-webkit-scrollbar, .content-display::-webkit-scrollbar { width: 8px; }
+        .chat-box::-webkit-scrollbar-track, .content-display::-webkit-scrollbar-track { background: #f2f3f3; }
+        .chat-box::-webkit-scrollbar-thumb, .content-display::-webkit-scrollbar-thumb { 
+            background: #d5dbdb;
+            border-radius: 4px;
+        }
+        .chat-box::-webkit-scrollbar-thumb:hover, .content-display::-webkit-scrollbar-thumb:hover {
+            background: #aab7b8;
+        }
+        @keyframes fadeIn { 
+            from { opacity: 0; transform: translateY(10px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+        .message, .content-text {
+            animation: fadeIn 0.3s ease;
+        }
+        @media (max-width: 768px) {
+            .container { padding: 20px 15px; }
+            .header h1 { font-size: 36px; }
+            .topics { grid-template-columns: 1fr; }
+            .content-area { grid-template-columns: 1fr; }
+            .user { margin-left: 0; }
+            .input-area { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="aws-nav">
+        <div class="nav-content">
+            <div class="aws-logo">aws</div>
+            <div class="nav-links">
+                <a href="#" class="nav-link">Products</a>
+                <a href="#" class="nav-link">Solutions</a>
+                <a href="#" class="nav-link">Pricing</a>
+                <a href="#" class="nav-link">Documentation</a>
+                <a href="#" class="nav-link">Learn</a>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <div class="header">
+            <h1>🛡️ <span class="aws-orange">AWS</span> Security 101</h1>
+            <p>Interactive Security Learning Assistant</p>
+            <div class="aws-badge">AWS Official Training Content</div>
+        </div>
+        
+        <div class="topics">
+            <button class="topic-btn" onclick="showContent('iam')">
+                <span class="topic-icon">🔐</span>
+                <div class="topic-title">Identity & Access Management</div>
+                <div class="topic-desc">Learn about IAM users, roles, policies, and access control best practices</div>
+            </button>
+            <button class="topic-btn" onclick="showContent('vpc')">
+                <span class="topic-icon">🌐</span>
+                <div class="topic-title">VPC & Network Security</div>
+                <div class="topic-desc">Understand security groups, NACLs, and network isolation strategies</div>
+            </button>
+            <button class="topic-btn" onclick="showContent('encryption')">
+                <span class="topic-icon">🔒</span>
+                <div class="topic-title">Data Encryption</div>
+                <div class="topic-desc">Explore encryption at rest, in transit, and key management with KMS</div>
+            </button>
+            <button class="topic-btn" onclick="showContent('monitoring')">
+                <span class="topic-icon">📊</span>
+                <div class="topic-title">Security Monitoring</div>
+                <div class="topic-desc">Monitor with CloudTrail, GuardDuty, and Security Hub</div>
+            </button>
+            <button class="topic-btn" onclick="showContent('compliance')">
+                <span class="topic-icon">✅</span>
+                <div class="topic-title">Compliance & Governance</div>
+                <div class="topic-desc">AWS Config, compliance frameworks, and governance strategies</div>
+            </button>
+            <button class="topic-btn" onclick="showContent('best-practices')">
+                <span class="topic-icon">⭐</span>
+                <div class="topic-title">Security Best Practices</div>
+                <div class="topic-desc">Industry standards and AWS Well-Architected security principles</div>
+            </button>
+        </div>
+
+        <div class="content-area">
+            <div class="chat-section">
+                <div class="chat-box" id="chatBox">
+                    <div class="message bot">
+                        <strong>AWS Security Assistant:</strong> Welcome to AWS Security 101! Select a topic above to learn about AWS security fundamentals, or ask me any question about AWS security.
+                    </div>
+                </div>
+                <div class="input-area">
+                    <input type="text" id="userInput" placeholder="Ask about AWS security topics..." onkeypress="handleEnter(event)">
+                    <button class="send-btn" onclick="sendMessage()">Send</button>
+                </div>
+            </div>
+
+            <div class="content-display" id="contentDisplay">
+                <h3>AWS Security Topics</h3>
+                <div class="content-text">
+                    <p><strong>Welcome to AWS Security 101!</strong></p><br>
+                    <p>Click on any topic above to explore:</p><br>
+                    <ul style="margin-left: 20px; line-height: 2;">
+                        <li><strong>IAM:</strong> Identity and Access Management</li>
+                        <li><strong>VPC:</strong> Virtual Private Cloud Security</li>
+                        <li><strong>Encryption:</strong> Data Protection Strategies</li>
+                        <li><strong>Monitoring:</strong> Security Monitoring Tools</li>
+                        <li><strong>Compliance:</strong> Governance Frameworks</li>
+                        <li><strong>Best Practices:</strong> Security Guidelines</li>
+                    </ul><br>
+                    <p>All content is based on AWS official documentation and best practices.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const securityContent = {
+            iam: {
+                title: "Identity & Access Management (IAM)",
+                content: `
+                    <p><strong>AWS IAM Fundamentals:</strong></p><br>
+                    <ul style="margin-left: 20px; line-height: 1.8;">
+                        <li><strong>Users:</strong> Individual AWS account holders with unique credentials</li>
+                        <li><strong>Groups:</strong> Collections of users with similar permission requirements</li>
+                        <li><strong>Roles:</strong> Temporary access credentials for services and applications</li>
+                        <li><strong>Policies:</strong> JSON documents that define specific permissions</li>
+                        <li><strong>Principle of Least Privilege:</strong> Grant only minimum required access</li>
+                    </ul><br>
+                    <p><strong>IAM Best Practices:</strong></p><br>
+                    <ul style="margin-left: 20px; line-height: 1.8;">
+                        <li>Enable Multi-Factor Authentication (MFA) for all users</li>
+                        <li>Use IAM roles instead of long-term access keys</li>
+                        <li>Regularly review and rotate credentials</li>
+                        <li>Implement strong password policies</li>
+                        <li>Use AWS managed policies when possible</li>
+                        <li>Monitor IAM activity with CloudTrail</li>
+                    </ul><br>
+                    <p><strong>Key Components:</strong></p><br>
+                    <p>• <strong>Access Keys:</strong> Programmatic access credentials<br>
+                    • <strong>Permissions Boundary:</strong> Maximum permissions for entities<br>
+                    • <strong>Service-Linked Roles:</strong> Predefined roles for AWS services</p>
+                `
+            },
+            vpc: {
+                title: "VPC & Network Security",
+                content: `
+                    <p><strong>Amazon VPC Security Components:</strong></p><br>
+                    <ul style="margin-left: 20px; line-height: 1.8;">
+                        <li><strong>Security Groups:</strong> Instance-level stateful firewalls</li>
+                        <li><strong>Network ACLs:</strong> Subnet-level stateless firewalls</li>
+                        <li><strong>Private Subnets:</strong> No direct internet access for resources</li>
+                        <li><strong>NAT Gateway:</strong> Outbound internet access for private resources</li>
+                        <li><strong>VPC Flow Logs:</strong> Network traffic monitoring and analysis</li>
+                    </ul><br>
+                    <p><strong>Network Security Best Practices:</strong></p><br>
+                    <ul style="margin-left: 20px; line-height: 1.8;">
+                        <li>Use private subnets for sensitive resources</li>
+                        <li>Implement defense in depth with multiple security layers</li>
+                        <li>Monitor network traffic with VPC Flow Logs</li>
+                        <li>Use VPC endpoints for AWS service access</li>
+                        <li>Enable DNS logging and monitoring</li>
+                    </ul><br>
+                    <p><strong>Advanced Features:</strong></p><br>
+                    <p>• <strong>VPC Peering:</strong> Connect VPCs securely<br>
+                    • <strong>Transit Gateway:</strong> Centralized connectivity hub<br>
+                    • <strong>AWS PrivateLink:</strong> Private connectivity to services</p>
+                `
+            },
+            encryption: {
+                title: "AWS Data Encryption",
+                content: `
+                    <p><strong>AWS Encryption Services:</strong></p><br>
+                    <ul style="margin-left: 20px; line-height: 1.8;">
+                        <li><strong>Encryption at Rest:</strong> S3, EBS, RDS automatic encryption</li>
+                        <li><strong>Encryption in Transit:</strong> TLS/SSL for all data transfers</li>
+                        <li><strong>AWS KMS:</strong> Centralized key management service</li>
+                        <li><strong>CloudHSM:</strong> Hardware security modules for compliance</li>
+                        <li><strong>Client-side Encryption:</strong> Encrypt before sending to AWS</li>
+                    </ul><br>
+                    <p><strong>Key Management Best Practices:</strong></p><br>
+                    <ul style="margin-left: 20px; line-height: 1.8;">
+                        <li>Use AWS managed keys for simplicity</li>
+                        <li>Customer managed keys for full control</li>
+                        <li>Implement regular key rotation policies</li>
+                        <li>Use envelope encryption for large data</li>
+                        <li>Monitor key usage with CloudTrail</li>
+                    </ul><br>
+                    <p><strong>Encryption Types:</strong></p><br>
+                    <p>• <strong>Server-Side Encryption:</strong> AWS handles encryption/decryption<br>
+                    • <strong>Client-Side Encryption:</strong> You manage encryption process<br>
+                    • <strong>Field-Level Encryption:</strong> Encrypt specific data fields</p>
+                `
+            },
+            monitoring: {
+                title: "Security Monitoring & Detection",
+                content: `
+                    <p><strong>AWS Security Monitoring Tools:</strong></p><br>
+                    <ul style="margin-left: 20px; line-height: 1.8;">
+                        <li><strong>CloudTrail:</strong> API call logging and audit trails</li>
+                        <li><strong>GuardDuty:</strong> Intelligent threat detection service</li>
+                        <li><strong>Security Hub:</strong> Centralized security findings dashboard</li>
+                        <li><strong>Config:</strong> Resource compliance and configuration monitoring</li>
+                        <li><strong>CloudWatch:</strong> Metrics, logs, and automated responses</li>
+                    </ul><br>
+                    <p><strong>Monitoring Strategy:</strong></p><br>
+                    <ul style="margin-left: 20px; line-height: 1.8;">
+                        <li>Enable CloudTrail in all regions</li>
+                        <li>Set up automated alerting for security events</li>
+                        <li>Regular security assessments and reviews</li>
+                        <li>Implement real-time threat detection</li>
+                        <li>Use AWS Security Hub for centralized view</li>
+                    </ul><br>
+                    <p><strong>Advanced Monitoring:</strong></p><br>
+                    <p>• <strong>AWS Detective:</strong> Security investigation service<br>
+                    • <strong>AWS Macie:</strong> Data security and privacy service<br>
+                    • <strong>AWS Inspector:</strong> Application security assessment</p>
+                `
+            },
+            compliance: {
+                title: "Compliance & Governance",
+                content: `
+                    <p><strong>AWS Compliance Framework:</strong></p><br>
+                    <ul style="margin-left: 20px; line-height: 1.8;">
+                        <li><strong>AWS Config:</strong> Resource compliance monitoring</li>
+                        <li><strong>AWS Organizations:</strong> Multi-account governance</li>
+                        <li><strong>Service Control Policies:</strong> Account-level permission boundaries</li>
+                        <li><strong>Compliance Programs:</strong> SOC, PCI DSS, HIPAA, GDPR</li>
+                        <li><strong>AWS Artifact:</strong> Compliance reports and agreements</li>
+                    </ul><br>
+                    <p><strong>Governance Best Practices:</strong></p><br>
+                    <ul style="margin-left: 20px; line-height: 1.8;">
+                        <li>Implement organizational units for account structure</li>
+                        <li>Use SCPs for preventive controls</li>
+                        <li>Regular compliance audits and assessments</li>
+                        <li>Automate compliance checking</li>
+                        <li>Document security procedures</li>
+                    </ul><br>
+                    <p><strong>Compliance Tools:</strong></p><br>
+                    <p>• <strong>AWS Control Tower:</strong> Landing zone setup<br>
+                    • <strong>AWS Well-Architected Tool:</strong> Architecture reviews<br>
+                    • <strong>AWS Trusted Advisor:</strong> Best practice recommendations</p>
+                `
+            },
+            'best-practices': {
+                title: "AWS Security Best Practices",
+                content: `
+                    <p><strong>AWS Well-Architected Security Pillar:</strong></p><br>
+                    <ul style="margin-left: 20px; line-height: 1.8;">
+                        <li><strong>Identity Foundation:</strong> Implement strong identity controls</li>
+                        <li><strong>Apply Security at All Layers:</strong> Defense in depth approach</li>
+                        <li><strong>Enable Traceability:</strong> Log and monitor all activities</li>
+                        <li><strong>Automate Security:</strong> Use automation for consistency</li>
+                        <li><strong>Protect Data:</strong> Encrypt data at rest and in transit</li>
+                        <li><strong>Prepare for Security Events:</strong> Incident response planning</li>
+                    </ul><br>
+                    <p><strong>Implementation Guidelines:</strong></p><br>
+                    <ul style="margin-left: 20px; line-height: 1.8;">
+                        <li>Regular security reviews and assessments</li>
+                        <li>Automated compliance checking</li>
+                        <li>Continuous monitoring and improvement</li>
+                        <li>Security training for development teams</li>
+                        <li>Incident response procedures</li>
+                    </ul><br>
+                    <p><strong>Security Automation:</strong></p><br>
+                    <p>• <strong>AWS Systems Manager:</strong> Patch management<br>
+                    • <strong>AWS Lambda:</strong> Automated security responses<br>
+                    • <strong>AWS CloudFormation:</strong> Infrastructure as code security</p>
+                `
+            }
+        };
+
+        function showContent(topic) {
+            const content = securityContent[topic];
+            if (content) {
+                const contentDisplay = document.getElementById('contentDisplay');
+                contentDisplay.innerHTML = `
+                    <h3>${content.title}</h3>
+                    <div class="content-text">${content.content}</div>
+                `;
+                
+                addMessage(`Show me information about ${content.title}`, true);
+                addMessage(`Here's comprehensive information about ${content.title}. Check the right panel for detailed content.`);
+            }
+        }
+
+        function addMessage(content, isUser = false) {
+            const chatBox = document.getElementById('chatBox');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
+            messageDiv.innerHTML = `<strong>${isUser ? 'You' : 'AWS Security Assistant'}:</strong> ${content}`;
+            chatBox.appendChild(messageDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('userInput');
+            const message = input.value.trim();
+            if (!message) return;
+
+            addMessage(message, true);
+            input.value = '';
+
+            const response = generateResponse(message.toLowerCase());
+            addMessage(response);
+        }
+
+        function generateResponse(message) {
+            if (message.includes('iam') || message.includes('identity') || message.includes('access')) {
+                showContent('iam');
+                return "I've displayed comprehensive IAM information in the content panel. IAM is fundamental to AWS security.";
+            } else if (message.includes('vpc') || message.includes('network') || message.includes('security group')) {
+                showContent('vpc');
+                return "I've shown VPC security details in the content panel. Network security is crucial for protecting your resources.";
+            } else if (message.includes('encrypt') || message.includes('kms') || message.includes('key')) {
+                showContent('encryption');
+                return "I've displayed encryption information in the content panel. Data protection is essential for security.";
+            } else if (message.includes('monitor') || message.includes('cloudtrail') || message.includes('guardduty')) {
+                showContent('monitoring');
+                return "I've shown monitoring tools in the content panel. Continuous monitoring helps detect threats early.";
+            } else if (message.includes('compliance') || message.includes('governance') || message.includes('config')) {
+                showContent('compliance');
+                return "I've displayed compliance information in the content panel. Governance ensures security standards.";
+            } else if (message.includes('best practice') || message.includes('recommendation')) {
+                showContent('best-practices');
+                return "I've shown security best practices in the content panel. Following these guidelines ensures robust security.";
+            } else {
+                return "I can help you learn about AWS security topics including IAM, VPC Security, Encryption, Monitoring, Compliance, and Best Practices. Please select a topic above or ask a specific question about AWS security.";
+            }
+        }
+
+        function handleEnter(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+    </script>
+</body>
+</html>
